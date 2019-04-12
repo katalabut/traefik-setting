@@ -1,0 +1,42 @@
+
+logLevel = "ERROR" #DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+InsecureSkipVerify = false 
+defaultEntryPoints = ["https", "http"]
+
+# WEB interface of Traefik - it will show web page with overview of frontend and backend configurations 
+[api]
+  entryPoint = "traefik"
+  dashboard = true
+  address = ":8080"
+
+# Force HTTPS
+[entryPoints]
+  [entryPoints.http]
+  address = ":80"
+    [entryPoints.http.redirect]
+    entryPoint = "https"
+  [entryPoints.https]
+  address = ":443"
+    [entryPoints.https.tls]
+
+# Let's encrypt configuration
+[acme]
+email = "mail@example.com"
+storage="/etc/traefik/acme.json"
+entryPoint = "https"
+acmeLogging=true
+[acme.dnsChallenge]
+  provider = "digitalocean"
+  delayBeforeCheck = 300
+[[acme.domains]]
+   main = "example.com"
+   
+# Connection to docker host system (docker.sock)
+[docker]
+endpoint = "unix:///var/run/docker.sock"
+domain = "example.com"
+watch = true
+exposedbydefault = false
+usebindportip = false
+swarmMode = false
+network = "web"
